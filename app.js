@@ -6,7 +6,7 @@ import {
   getEpisodesHtml,
   getPageNumberFromUrlEpisodes as getEpisodePageNumber,
 } from "./Episode.js";
-import { ApiService } from "./Classes.js";
+import { Character, Episode, ApiService } from "./Classes.js";
 
 const episodesSelect = document.getElementById("episodes");
 const charactersButton = document.getElementById("character");
@@ -16,6 +16,11 @@ const nextBtn = document.getElementById("NextBtn");
 const pageInfoLi = document.getElementById("Number");
 const nameSearchInput = document.getElementById("searchName");
 const statusFilterSelect = document.getElementById("statusFilter");
+
+let currentRawCharactersData = [];
+let currentRawEpisodesData = [];
+
+let globalModalInstance = null;
 
 let currentView = "characters";
 //Variables de caracteres
@@ -62,14 +67,13 @@ async function renderContent(resetPage = false) {
       fetchUrl = baseUrl.toString();
     }
 
-    const { html, info } = await getCharactersHtml(
+    const { html, info, rawCharactersData } = await getCharactersHtml(
       fetchUrl,
       currentCharacterFilters
     );
-    if (info && info.count === 0) {
-      console.log("No se encontraron personajes con ese nombre.");
-    }
+
     mainContentContainer.innerHTML = html;
+    currentRawCharactersData = rawCharactersData;
 
     charPrevPageUrl = info.prev;
     charNextPageUrl = info.next;
@@ -107,13 +111,14 @@ async function renderContent(resetPage = false) {
       fetchUrl = baseUrl.toString();
     }
 
-    const { html, info } = await getEpisodesHtml(
+    const { html, info, rawEpisodesData } = await getEpisodesHtml(
       fetchUrl,
       currentEpisodeFilters
     );
 
     mainContentContainer.innerHTML = html;
-
+    currentRawEpisodesData = rawEpisodesData;
+    console.log(currentRawEpisodesData);
     episodePrevPageUrl = info.prev;
     episodeNextPageUrl = info.next;
     episodeTotalPages = info.pages;
@@ -158,6 +163,56 @@ function updatePaginationButtons(prevUrl, nextUrl, currentPage, totalPages) {
   } else {
     nextBtn.classList.add("disabled");
     nextBtn.setAttribute("tabindex", "-1");
+  }
+}
+
+/**
+ *
+ * @param {string} title Título del modal.
+ * @param {Promise<string>} contentPromise Una promesa que resuelve con el HTML del contenido.
+ */
+async function createAndShowModal(title, contentPromise) {
+  if (!globalModalInstance) {
+    globalModalInstance = document.createElement("dialog");
+    globalModalInstance.id = "dynamicModal";
+    globalModalInstance.classList.add("modal");
+    document.body.appendChild(globalModalInstance);
+
+    globalModalInstance.innerHTML = `
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button id="closeModalBtn" class="close-button">&times;</button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <p>Cargando...</p>
+            </div>
+        `;
+
+    globalModalInstance
+      .querySelector("#closeModalBtn")
+      .addEventListener("click", () => {
+        globalModalInstance.close();
+      });
+
+    globalModalInstance.addEventListener("click", (e) => {
+      if (e.target === globalModalInstance) {
+        globalModalInstance.close();
+      }
+    });
+  }
+
+  globalModalInstance.querySelector("#modalTitle").textContent = title;
+  const modalContentDiv = globalModalInstance.querySelector("#modalContent");
+  modalContentDiv.innerHTML = "<p>Cargando información detallada...</p>";
+
+  globalModalInstance.showModal();
+
+  try {
+    const contentHtml = await contentPromise;
+    modalContentDiv.innerHTML = contentHtml;
+  } catch (error) {
+    console.error("Error al cargar contenido del modal:", error);
+    modalContentDiv.innerHTML = "<p>Error al cargar la información.</p>";
   }
 }
 
@@ -232,6 +287,35 @@ nameSearchInput.addEventListener("input", (e) => {
 nameSearchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     e.target.blur();
+  }
+});
+
+mainContentContainer.addEventListener("click", async (e) => {
+  const characterCard = e.target.closest(".img-container");
+  const episodeCard = e.target.closest(".episode-card");
+
+  if (characterCard && currentView === "characters") {
+    const characterId = parseInt(characterCard.dataset.characterId);
+    const character = currentRawCharactersData.find(
+      (char) => char.id === characterId
+    );
+
+    if (character) {
+      await createAndShowModal(
+        `${character.name}`,
+        character.getModalContent()
+      );
+    }
+  } else if (episodeCard && currentView === "episodes") {
+    const episodeId = parseInt(episodeCard.dataset.episodeId);
+    const episode = currentRawEpisodesData.find((ep) => ep.id === episodeId);
+
+    if (episode) {
+      await createAndShowModal(
+        `${episode.id}: ${episode.name}`,
+        episode.getModalContent()
+      );
+    }
   }
 });
 

@@ -214,9 +214,90 @@ article {
   width: 100%;
 }
 
+
 .pagination {
   display: flex;
+  justify-content: center; 
+  align-items: center;
+  background-color: #fff; 
+  list-style: none; 
+  margin: 0;
+}
+
+
+.page-link, 
+.btn-der {    
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; 
+  background-color: #f0fff0f0; 
+  display: flex;
   justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: none; 
+  outline: none; 
+  text-decoration: none; 
+  color: #333; 
+  font-size: 1.8em; 
+  transition: all 0.2s ease-in-out; 
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.1),  
+    -6px -6px 12px rgba(255, 255, 255, 0.7); 
+}
+
+
+.page-link:hover,
+.btn-der:hover {
+  box-shadow:
+    2px 2px 5px rgba(0, 0, 0, 0.1),
+    -2px -2px 5px rgba(255, 255, 255, 0.7);
+  transform: scale(0.98);
+}
+
+
+.page-link:active,
+.btn-der:active {
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+  transform: scale(0.95); 
+}
+
+
+.page-link.disabled,
+.btn-der.disabled {
+  opacity: 0.5; 
+  cursor: not-allowed; 
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.05), 
+    -6px -6px 12px rgba(255, 255, 255, 0.4);
+}
+
+.page-link.disabled:hover,
+.btn-der.disabled:hover,
+.page-link.disabled:active,
+.btn-der.disabled:active {
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.05),
+    -6px -6px 12px rgba(255, 255, 255, 0.4);
+  transform: none; 
+}
+
+
+.page-link span,
+.btn-der span {
+  display: block; 
+  line-height: 1;
+  padding-bottom: 2px; 
+}
+
+#Number {
+  font-family: sans-serif; 
+  font-size: 1.1em;
+  color: #555;
+  margin: 0 10px;
+  white-space: nowrap; 
 }
 
 .filtro {
@@ -232,14 +313,10 @@ article {
   margin: 10px;
   border: 1px solid rgb(26, 32, 44);
   border-radius: 4px;
-  color: white;
-  background-color: #455e84
+color: black;
+background-color: #f0fff0f0;
+font-size: 1rem;
 }
-
-.pagination #Number {
-  margin: 10px;
-}
-
 .filtro .search {
   display: flex;
   align-items: center;
@@ -254,7 +331,7 @@ article {
   border-radius: 0.25rem;
   border: 2px solid;
   border-color: rgba(186, 17, 17, 0.04);
-  background-color: #d1d9e6;
+  background-color: #e8e8e8;
 }
 
 .episode-card {
@@ -264,7 +341,7 @@ article {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 340px;
-  height: 15rem;
+  height: 12rem;
   padding: 10px;
   margin: 2rem 0.5rem 1rem;
   transition: all 0.3s ease-in-out;
@@ -308,5 +385,205 @@ footer {
   justify-content: center;
   color: #fff;
 }
+
+
+#dynamicModal {
+  border: none;
+  border-radius: 15px;
+  padding: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  max-width: 600px;
+  width: 90%;
+  background-color: #f0f0f0;
+  overflow: hidden;
+  animation: fadeInScale 0.3s ease-out forwards;
+  margin: auto;
+}
+
+
+#dynamicModal::backdrop { 
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  animation: fadeBackdropIn 0.3s ease-out forwards;
+}
+
+
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  background-color: #333;
+  color: #fff;
+  border-bottom: 1px solid #444;
+}
+
+.modal .modal-header h2 {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.modal .close-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2em;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.modal .close-button:hover {
+  color: #f00;
+}
+
+.modal .modal-body {
+  padding: 20px 25px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* --- Estilos específicos para el contenido del modal de personaje --- */
+.modal-content-character {
+  text-align: center;
+}
+.modal-character-image-large {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 4px solid #6c757d;
+}
+.modal-content-character h3 {
+  font-size: 2em;
+  margin-bottom: 10px;
+  color: #333;
+}
+.modal-content-character p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 1.1em;
+}
+.modal-content-character ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+  max-height: 150px; /* Limita la altura de la lista de episodios */
+  overflow-y: auto; /* Permite scroll */
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+.modal-content-character li {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  color: #444;
+}
+
+/* --- Estilos específicos para el contenido del modal de episodio --- */
+.modal-content-episode h3 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+  color: #333;
+}
+.modal-content-episode p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 1.1em;
+}
+.modal-characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 3 columnas aprox */
+  gap: 15px;
+  margin-top: 15px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  max-height: 250px; /* Limita la altura de la grid de personajes */
+  overflow-y: auto; /* Permite scroll */
+}
+.modal-character-item {
+  text-align: center;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.modal-character-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 5px;
+  border: 2px solid #a0a0a0;
+}
+.modal-character-name {
+  font-weight: 600;
+  font-size: 0.9em;
+  margin: 0;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modal-character-status {
+  font-size: 0.75em;
+  color: #666;
+  margin-top: 3px;
+}
+
+
+/* Basic Animations */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+    max-width: unset;
+  }
+  .modal .modal-body {
+    padding: 15px;
+  }
+  .modal-characters-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+  }
+  .modal-character-image {
+    width: 60px;
+    height: 60px;
+  }
+  .modal-character-image-large {
+    width: 100px;
+    height: 100px;
+  }
+  .modal-content-character h3 {
+    font-size: 1.5em;
+  }
+}
+
 
 

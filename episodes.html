@@ -2,12 +2,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./styles/style.css" />
+    <link rel="stylesheet" href="./styles/styles.css" />
     <title>Document</title>
   </head>
   <body>
     <article>
-      <div class="episode-card rick-morty-theme">
+      <div class="episode-card">
         <h2 class="episode-number">2</h2>
         <p class="episode-name">
           <span class="label">Nombre:</span>
@@ -15,34 +15,18 @@
         </p>
         <p class="episode-date">December 9, 2013</p>
         <p class="episode-code">S01E02</p>
-      </div>
-      <div class="episode-card rick-morty-theme">
-        <h2 class="episode-number">2</h2>
-        <p class="episode-name">
-          <span class="label">Nombre:</span>
-          <span class="value">Lawnmower Dog</span>
-        </p>
-        <p class="episode-date">December 9, 2013</p>
-        <p class="episode-code">S01E02</p>
-      </div>
-      <div class="episode-card rick-morty-theme">
-        <h2 class="episode-number">2</h2>
-        <p class="episode-name">
-          <span class="label">Nombre:</span>
-          <span class="value">Lawnmower Dog</span>
-        </p>
-        <p class="episode-date">December 9, 2013</p>
-        <p class="episode-code">S01E02</p>
-      </div>
-      <div class="episode-card rick-morty-theme">
-        <h2 class="episode-number">2</h2>
-        <p class="episode-name">
-          <span class="label">Nombre:</span>
-          <span class="value">Lawnmower Dog</span>
-        </p>
-        <p class="episode-date">December 9, 2013</p>
-        <p class="episode-code">S01E02</p>
+        <div class="modal-container">
+          <dialog id="modalEpisodes">
+            <a class="btn-close">Cerrar</a>
+          </dialog>
+        </div>
+
+        <button class="btn-open">
+          <span class="text">Detalles</span>
+        </button>
       </div>
     </article>
   </body>
+
+  <script src=""></script>
 </html>

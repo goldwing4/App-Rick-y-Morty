@@ -9,25 +9,15 @@ export async function getEpisodesHtml(url, filters = {}) {
 
   let episodesHtml = "";
   if (data.results && data.results.length > 0) {
-    const episodePromises = data.results.map(async (episodeData) => {
-      const episodeInstance = new Episode(
-        episodeData.id,
-        episodeData.name,
-        episodeData.air_date,
-        episodeData.episode,
-        episodeData.characters
-      );
-      return await episodeInstance.render();
-    });
-
-    const renderedEpisodes = await Promise.all(episodePromises);
-    episodesHtml = renderedEpisodes.join("");
+    episodesHtml = data.results.map((episode) => episode.render()).join("");
   } else {
     episodesHtml = "<p>No se encontraron episodios.</p>";
   }
+
   return {
     html: episodesHtml,
     info: data.info,
+    rawEpisodesData: data.results,
   };
 }
 

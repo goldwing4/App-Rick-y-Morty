@@ -1,4 +1,4 @@
-import { ApiService } from "./Classes.js";
+import { Character, ApiService } from "./Classes.js";
 
 const apiService = new ApiService();
 
@@ -19,6 +19,7 @@ export async function getCharactersHtml(url, filters = {}) {
   return {
     html: charactersHtml,
     info: data.info,
+    rawCharactersData: data.results,
   };
 }
 

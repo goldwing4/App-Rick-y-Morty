@@ -14,7 +14,17 @@ export class Character {
    * @param {object} origin Lugar de origen
    * @param {object} location Localizacion
    */
-  constructor(id, name, status, species, gender, image, origin, location) {
+  constructor(
+    id,
+    name,
+    status,
+    species,
+    gender,
+    image,
+    origin,
+    location,
+    episode
+  ) {
     this.id = id;
     this.name = name;
     this.status = status;
@@ -23,6 +33,7 @@ export class Character {
     this.image = image;
     this.origin = origin;
     this.location = location;
+    this.episode = episode;
   }
 
   statusCharacter() {
@@ -61,7 +72,7 @@ export class Character {
 
   render() {
     return `
-      <div class="img-container">
+      <div class="img-container" data-character-id="${this.id}">
              <img
                src="${this.image}"
                alt="${this.name}"
@@ -79,6 +90,52 @@ export class Character {
              <span>${this.getLocationName()}</span>
            </div>
            </div>
+    `;
+  }
+
+  async getModalContent() {
+    let episodesHtml = "<p>Cargando episodios...</p>";
+    if (this.episode && this.episode.length > 0) {
+      try {
+        const episodeIds = this.episode.map((url) => url.split("/").pop());
+        const episodesResponse = await fetch(
+          `https://rickandmortyapi.com/api/episode/${episodeIds.join(",")}`
+        );
+        const episodesData = await episodesResponse.json();
+
+        const actualEpisodes = Array.isArray(episodesData)
+          ? episodesData
+          : [episodesData];
+        const episodeNames = actualEpisodes.map(
+          (ep) => `${ep.episode} - ${ep.name}`
+        ); // Formato S01E01 - Nombre
+        episodesHtml = `<p><strong>Aparece en:</strong></p><ul>${episodeNames
+          .map((name) => `<li>${name}</li>`)
+          .join("")}</ul>`;
+      } catch (error) {
+        console.error(
+          `Error al obtener episodios para el personaje ${this.name}:`,
+          error
+        );
+        episodesHtml = `<p>Episodios: No se pudieron cargar.</p>`;
+      }
+    } else {
+      episodesHtml = `<p>No hay episodios asociados.</p>`;
+    }
+
+    return `
+      <div class="modal-content-character">
+        <img src="${this.image}" alt="${
+      this.name
+    }" class="modal-character-image-large">
+        <h3>${this.name}</h3>
+        <p><strong>Estado:</strong> ${this.status}</p>
+        <p><strong>Especie:</strong> ${this.species}</p>
+        <p><strong>Género:</strong> ${this.gender}</p>
+        <p><strong>Origen:</strong> ${this.getOriginName()}</p>
+        <p><strong>Localización:</strong> ${this.getLocationName()}</p>
+        ${episodesHtml}
+      </div>
     `;
   }
 }
@@ -102,8 +159,17 @@ export class Episode {
     this.characters = characters;
   }
 
-  async render() {
-    let characterNamesHtml = '<div class="episode-characters-list">';
+  render() {
+    return `<div class="episode-card" data-episode-id ="${this.id}">
+        <h3 class="episode-name">${this.id}. ${this.name}</h3>
+        <p class="episode-date">${this.air_date}</p>
+        <p class="episode-code">${this.episode}</p>
+        
+      </div>`;
+  }
+
+  async getModalContent() {
+    let charactersHtml = "<p>Cargando personajes...</p>";
     if (this.characters && this.characters.length > 0) {
       try {
         const characterIds = this.characters.map((url) => url.split("/").pop());
@@ -111,32 +177,48 @@ export class Episode {
           `https://rickandmortyapi.com/api/character/${characterIds.join(",")}`
         );
         const charactersData = await charactersResponse.json();
+
         const actualCharacters = Array.isArray(charactersData)
           ? charactersData
           : [charactersData];
 
-        const names = actualCharacters.map((char) => char.name);
-        characterNamesHtml += `<p><strong>Personajes:</strong> ${names.join(
-          ", "
-        )}</p>`;
+        charactersHtml = `<div class="modal-characters-grid">`;
+        if (actualCharacters.length > 0) {
+          charactersHtml += actualCharacters
+            .map(
+              (charData) => `
+            <div class="modal-character-item">
+              <img src="${charData.image}" alt="${charData.name}" class="modal-character-image">
+              <p class="modal-character-name">${charData.name}</p>
+              <p class="modal-character-status">${charData.status}</p>
+            </div>
+          `
+            )
+            .join("");
+        } else {
+          charactersHtml += `<p>No hay personajes para este episodio.</p>`;
+        }
+        charactersHtml += `</div>`;
       } catch (error) {
         console.error(
           `Error al obtener personajes para el episodio ${this.name}:`,
           error
         );
-        characterNamesHtml += `<p>Personajes: No se pudieron cargar.</p>`;
+        charactersHtml = `<p>Personajes: No se pudieron cargar.</p>`;
       }
     } else {
-      characterNamesHtml += `<p>Personajes: Ninguno conocido.</p>`;
+      charactersHtml = `<p>No hay personajes asociados a este episodio.</p>`;
     }
-    characterNamesHtml += "</div>";
 
-    return `<div class="episode-card">
-        <h3 class="episode-name">${this.id}. ${this.name}</h3>
-        <p class="episode-date">${this.air_date}</p>
-        <p class="episode-code">${this.episode}</p>
-        ${characterNamesHtml}
-      </div>`;
+    return `
+      <div class="modal-content-episode">
+        <h3>${this.name}</h3>
+        <p><strong>Fecha de Emisión:</strong> ${this.air_date}</p>
+        <p><strong>Número de Episodio:</strong> ${this.episode}</p>
+        <h4>Personajes:</h4>
+        ${charactersHtml}
+      </div>
+    `;
   }
 }
 
@@ -191,7 +273,8 @@ export class ApiService {
             charData.gender,
             charData.image,
             charData.origin,
-            charData.location
+            charData.location,
+            charData.episode
           )
       );
       return { info: charactersData.info, results: characters };
