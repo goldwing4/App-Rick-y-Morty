@@ -1,3 +1,5 @@
+import { isFavorite } from "./localStorage.js";
+
 /**
  * @class Clase para personaje
  */
@@ -71,6 +73,7 @@ export class Character {
   }
 
   render() {
+    const isCharFavorite = isFavorite(this.id, "character");
     return `
       <div class="img-container" data-character-id="${this.id}">
              <img
@@ -78,10 +81,10 @@ export class Character {
                alt="${this.name}"
              />
              <h2>${this.name}</h2>
-           <span class ="info"><span class = "${this.statusCharacter()}"></span> ${
-      this.status
-    } - ${this.species}</span>       
+            
            <div>
+           <span class = "${this.statusCharacter()}"></span>
+           <span> ${this.status} - ${this.species}</span>      
             <span class = "${this.genderCharacter()}"></span>
             <span class="gender">${this.gender}</span>
              <span class="fa-solid fa-house" style="justify-self: center;"></span>
@@ -89,6 +92,7 @@ export class Character {
              <span class="fa-solid fa-location-dot" style="justify-self: center;"></span>
              <span>${this.getLocationName()}</span>
            </div>
+           <button class="favorite ${isCharFavorite ? "active" : ""}"></button>
            </div>
     `;
   }
@@ -160,11 +164,12 @@ export class Episode {
   }
 
   render() {
+    const isEpFavorite = isFavorite(this.id, "episode");
     return `<div class="episode-card" data-episode-id ="${this.id}">
         <h3 class="episode-name">${this.id}. ${this.name}</h3>
         <p class="episode-date">${this.air_date}</p>
         <p class="episode-code">${this.episode}</p>
-        
+        <button class="favorite ${isEpFavorite ? "active" : ""}"></button>
       </div>`;
   }
 

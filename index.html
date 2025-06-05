@@ -4,24 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./styles/styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
     <title>Rick y Morty</title>
     <link
       href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css"
-      rel="stylesheet"/>
+      rel="stylesheet"
+    />
     <link rel="shortcut icon" href="favicon.ico" />
   </head>
   <body>
     <nav>
       <div class="logo">
         <i class="bx bx-menu menu-icon"></i>
-        <a href="episodes.html" class="logo-img"><img src="./img/logo.png" ></a>
+        <a href="episodes.html" class="logo-img"
+          ><img src="./img/logo.png"
+        /></a>
       </div>
       <div class="sidebar">
         <div class="logo">
           <i class="bx bx-menu menu-icon"></i>
-          <span class="logo-img"><img src="./img/logo.png" walt=""></span>
+          <span class="logo-img"><img src="./img/logo.png" walt="" /></span>
         </div>
         <div class="sidebar-content">
           <ul class="lists">
@@ -37,40 +46,51 @@
                 <span class="link">Episodies</span>
               </a>
             </li>
-          </div>
+          </ul>
         </div>
       </div>
     </nav>
     <section class="overlay"></section>
     <main>
-    <div class="filtro">
-        <input type="text" placeholder="Escribe nombre" class="search" id="searchName">
+      <div class="filtro">
+        <input
+          type="text"
+          placeholder="Escribe nombre"
+          class="search"
+          id="searchName"
+        />
         <select name="status" id="statusFilter">
           <option value="">Todos</option>
           <option value="Alive">Vivo</option>
           <option value="Dead">Muerto</option>
           <option value="unknow">Desconocido</option>
         </select>
-    </div>
+        <button class="btn-favorite" id="viewFavoritesBtn">
+          <i class="fa-solid fa-heart" style="color: #ff1a1a"></i> Favoritos
+        </button>
+        <button class="btn-regresar" id="btnRegresar">Volver</button>
+      </div>
 
-    <div class="pagination">
-    <ul class="pagination">
-    <a class="page-link" id="PrevBtn" href="#" aria-label="Previous">
-    <span aria-hidden="true">&laquo;</span>
-    </a>
-    <p id="Number"></p>
-    <button class="btn-der" id="NextBtn" href="#" aria-label="Next">
-    <span aria-hidden="true">&raquo;</span>
-    </button>
-    </ul>
-    </div>
-    <article></article>
-  </main>
+      <div class="pagination">
+        <ul class="pagination">
+          <a class="page-link" id="PrevBtn" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+          <p id="Number"></p>
+          <button class="btn-der" id="NextBtn" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </button>
+        </ul>
+      </div>
+      <article></article>
+    </main>
     <footer>
-      <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 <a class="hover:underline">Jazzlin</a>. Todos los derechos reservados.
-    </span>
-  </footer>
+      <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
+        >© 2025 <a class="hover:underline">Jazzlin</a>. Todos los derechos
+        reservados.
+      </span>
+    </footer>
     <!--sript-->
-    <script type="module" src="app.js" ></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

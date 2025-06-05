@@ -7,7 +7,14 @@ import {
   getPageNumberFromUrlEpisodes as getEpisodePageNumber,
 } from "./Episode.js";
 import { Character, Episode, ApiService } from "./Classes.js";
-
+import {
+  loadFavorites,
+  itemFavorites,
+  isFavorite,
+  favoriteCharacters,
+  favoriteEpisodes,
+} from "./localStorage.js";
+//Variables para el DOM
 const episodesSelect = document.getElementById("episodes");
 const charactersButton = document.getElementById("character");
 const mainContentContainer = document.querySelector("article");
@@ -16,7 +23,9 @@ const nextBtn = document.getElementById("NextBtn");
 const pageInfoLi = document.getElementById("Number");
 const nameSearchInput = document.getElementById("searchName");
 const statusFilterSelect = document.getElementById("statusFilter");
+const btnRegresarFav = document.getElementById("btnRegresar");
 
+//Datos crudos
 let currentRawCharactersData = [];
 let currentRawEpisodesData = [];
 
@@ -43,16 +52,27 @@ let currentEpisodeFilters = {
   name: "",
 };
 /**
- *
+ * @function renderContent Renderiza el contenido de personajes o caracteres
  * @param {*} resetPage
  */
 async function renderContent(resetPage = false) {
-  mainContentContainer.innerHTML = "";
+  mainContentContainer.innerHTML = `<p> Cargando ${currentView}...</p>`;
+
+  let dataToRender = [];
+  let contentHtml = "";
 
   if (currentView === "characters") {
     statusFilterSelect.style.display = "inline-block";
   } else if (currentView === "episodes") {
     statusFilterSelect.style.display = "none";
+  }
+  if (
+    currentView === "favoriteCharacters" ||
+    currentView === "favoriteEpisodes"
+  ) {
+    btnRegresarFav.style.display = "inline-block";
+  } else {
+    btnRegresarFav.style.display = "none";
   }
 
   if (currentView === "characters") {
@@ -71,9 +91,9 @@ async function renderContent(resetPage = false) {
       fetchUrl,
       currentCharacterFilters
     );
-
     mainContentContainer.innerHTML = html;
     currentRawCharactersData = rawCharactersData;
+    dataToRender = rawCharactersData;
 
     charPrevPageUrl = info.prev;
     charNextPageUrl = info.next;
@@ -118,7 +138,8 @@ async function renderContent(resetPage = false) {
 
     mainContentContainer.innerHTML = html;
     currentRawEpisodesData = rawEpisodesData;
-    console.log(currentRawEpisodesData);
+    dataToRender = rawEpisodesData;
+
     episodePrevPageUrl = info.prev;
     episodeNextPageUrl = info.next;
     episodeTotalPages = info.pages;
@@ -143,7 +164,38 @@ async function renderContent(resetPage = false) {
       episodeCurrentPageNumber,
       episodeTotalPages
     );
+  } else if (currentView === "favoriteCharacters") {
+    const favoriteCharacterIds = Array.from(favoriteCharacters);
+    const favoriteData = currentRawCharactersData.filter((char) =>
+      favoriteCharacterIds.includes(char.id)
+    );
+    contentHtml = favoriteData.map((char) => char.render()).join("");
+    mainContentContainer.innerHTML = contentHtml;
+    dataToRender = favoriteData;
+    updatePaginationButtons(null, null, 1, 1);
+  } else if (currentView === "favoriteEpisodes") {
+    const favoriteEpisodesIds = Array.from(favoriteEpisodes);
+    const favoriteData = currentRawEpisodesData.filter((ep) =>
+      favoriteEpisodesIds.includes(ep.id)
+    );
+    contentHtml = favoriteData.map((ep) => ep.render()).join("");
+    mainContentContainer.innerHTML = contentHtml;
+    dataToRender = favoriteData;
+    updatePaginationButtons(null, null, 1, 1);
   }
+
+  dataToRender.forEach((item) => {
+    const type = item.episode ? "episode" : "character";
+    const cardElement = mainContentContainer.querySelector(
+      `[data-${type}-id="${item.id}"]`
+    );
+    if (cardElement) {
+      const favoriteButton = cardElement.querySelector(".favorite");
+      if (favoriteButton && isFavorite(item.id, type)) {
+        favoriteButton.classList.add("active");
+      }
+    }
+  });
 }
 
 function updatePaginationButtons(prevUrl, nextUrl, currentPage, totalPages) {
@@ -168,8 +220,8 @@ function updatePaginationButtons(prevUrl, nextUrl, currentPage, totalPages) {
 
 /**
  *
- * @param {string} title Título del modal.
- * @param {Promise<string>} contentPromise Una promesa que resuelve con el HTML del contenido.
+ * @param {string} title
+ * @param {Promise<string>} contentPromise  promesa que resuelve con el HTML del contenido.
  */
 async function createAndShowModal(title, contentPromise) {
   if (!globalModalInstance) {
@@ -218,9 +270,28 @@ async function createAndShowModal(title, contentPromise) {
 
 document.addEventListener("DOMContentLoaded", () => {
   currentView = "characters";
+  loadFavorites();
   renderContent();
+  const viewFavoritesBtn = document.getElementById("viewFavoritesBtn");
+  if (viewFavoritesBtn) {
+    viewFavoritesBtn.addEventListener("click", () => {
+      if (
+        currentView === "characters" ||
+        currentView === "favoriteCharacters"
+      ) {
+        currentView = "favoriteCharacters";
+      } else if (
+        currentView === "episodes" ||
+        currentView === "favoriteEpisodes"
+      ) {
+        currentView = "favoriteEpisodes";
+      }
+      renderContent();
+    });
+  }
 });
 
+//Eventos
 episodesSelect.addEventListener("click", () => {
   if (currentView !== "episodes") {
     currentView = "episodes";
@@ -272,6 +343,18 @@ statusFilterSelect.addEventListener("change", () => {
   }
 });
 
+btnRegresarFav.addEventListener("click", () => {
+  if (currentView === "favoriteCharacters") {
+    currentView = "characters";
+    renderContent(true);
+  } else if (currentView === "favoriteEpisodes") {
+    currentView = "episodes";
+    renderContent(true);
+  } else {
+    console.log("Error");
+  }
+});
+
 nameSearchInput.addEventListener("input", (e) => {
   if (currentView === "characters") {
     currentCharacterFilters.name = nameSearchInput.value.trim();
@@ -290,11 +373,41 @@ nameSearchInput.addEventListener("keypress", (e) => {
   }
 });
 
+//Evento para mostrar el modal
 mainContentContainer.addEventListener("click", async (e) => {
+  const favoriteButton = e.target.closest(".favorite");
+  if (favoriteButton) {
+    e.stopPropagation();
+
+    const cardElement =
+      favoriteButton.closest(".img-container") ||
+      favoriteButton.closest(".episode-card");
+    if (cardElement) {
+      const itemId = parseInt(
+        cardElement.dataset.characterId || cardElement.dataset.episodeId
+      );
+      const itemType = cardElement.classList.contains("img-container")
+        ? "character"
+        : "episode";
+
+      itemFavorites(itemId, itemType);
+
+      favoriteButton.classList.toggle("active");
+      console.log(
+        "Botón de favorito clicado. Estado:",
+        favoriteButton.classList.contains("active") ? "activo" : "inactivo"
+      );
+    }
+    return;
+  }
+
   const characterCard = e.target.closest(".img-container");
   const episodeCard = e.target.closest(".episode-card");
 
-  if (characterCard && currentView === "characters") {
+  if (
+    (characterCard && currentView === "characters") ||
+    currentView === "favoriteCharacters"
+  ) {
     const characterId = parseInt(characterCard.dataset.characterId);
     const character = currentRawCharactersData.find(
       (char) => char.id === characterId
@@ -306,7 +419,10 @@ mainContentContainer.addEventListener("click", async (e) => {
         character.getModalContent()
       );
     }
-  } else if (episodeCard && currentView === "episodes") {
+  } else if (
+    (episodeCard && currentView === "episodes") ||
+    currentView === "favoriteEpisodes"
+  ) {
     const episodeId = parseInt(episodeCard.dataset.episodeId);
     const episode = currentRawEpisodesData.find((ep) => ep.id === episodeId);
 

@@ -3,29 +3,59 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./styles/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <title>Document</title>
   </head>
   <body>
-    <article>
-      <div class="episode-card">
-        <h2 class="episode-number">2</h2>
-        <p class="episode-name">
-          <span class="label">Nombre:</span>
-          <span class="value">Lawnmower Dog</span>
-        </p>
-        <p class="episode-date">December 9, 2013</p>
-        <p class="episode-code">S01E02</p>
-        <div class="modal-container">
-          <dialog id="modalEpisodes">
-            <a class="btn-close">Cerrar</a>
-          </dialog>
-        </div>
-
-        <button class="btn-open">
-          <span class="text">Detalles</span>
+    <main>
+      <div class="filtro">
+        <input
+          type="text"
+          placeholder="Escribe nombre"
+          class="search"
+          id="searchName"
+        />
+        <select name="status" id="statusFilter">
+          <option value="">Todos</option>
+          <option value="Alive">Vivo</option>
+          <option value="Dead">Muerto</option>
+          <option value="unknow">Desconocido</option>
+        </select>
+        <button class="btn-favorite" id="viewFavoritesBtn">
+          ver favoritos
         </button>
       </div>
-    </article>
+      <article>
+        <div class="img-container" data-character-id="2">
+          <img
+            src="https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+            alt="Morty Smith"
+          />
+          <h2>Morty Smith</h2>
+
+          <div>
+            <span class="fa-solid fa-face-smile"></span>
+            <span> Alive - Human</span>
+            <span class="fa-solid fa-mars"></span>
+            <span class="gender">Male</span>
+            <span class="fa-solid fa-house" style="justify-self: center"></span>
+            <span> unknown</span>
+            <span
+              class="fa-solid fa-location-dot"
+              style="justify-self: center"
+            ></span>
+            <span>Citadel of Ricks</span>
+          </div>
+          <button class="favorite"></button>
+        </div>
+      </article>
+    </main>
   </body>
 
   <script src=""></script>
