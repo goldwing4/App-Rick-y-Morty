@@ -2,11 +2,13 @@ import {
   getCharactersHtml,
   getPageNumberFromUrl as getCharPageNumber,
 } from "./Character.js";
+
 import {
   getEpisodesHtml,
   getPageNumberFromUrlEpisodes as getEpisodePageNumber,
 } from "./Episode.js";
-import { Character, Episode, ApiService } from "./Classes.js";
+
+import { ApiService } from "./Classes.js";
 import {
   loadFavorites,
   itemFavorites,
@@ -14,6 +16,7 @@ import {
   favoriteCharacters,
   favoriteEpisodes,
 } from "./localStorage.js";
+
 //Variables para el DOM
 const episodesSelect = document.getElementById("episodes");
 const charactersButton = document.getElementById("character");
@@ -31,7 +34,9 @@ let currentRawEpisodesData = [];
 
 let globalModalInstance = null;
 
+//Vista por defecto
 let currentView = "characters";
+
 //Variables de caracteres
 let currentCharacterUrl = new ApiService().URLCharacters;
 let charPrevPageUrl = null;
@@ -42,6 +47,7 @@ let currentCharacterFilters = {
   status: "",
   name: "",
 };
+
 //Variables de episodios
 let currentEpisodeUrl = new ApiService().URLEpisodes;
 let episodePrevPageUrl = null;
@@ -51,8 +57,9 @@ let episodeCurrentPageNumber = 1;
 let currentEpisodeFilters = {
   name: "",
 };
+
 /**
- * @function renderContent Renderiza el contenido de personajes o caracteres
+ * @function renderContent Renderiza el contenido de personajes/caracteres/favoritos
  * @param {*} resetPage
  */
 async function renderContent(resetPage = false) {
@@ -61,20 +68,25 @@ async function renderContent(resetPage = false) {
   let dataToRender = [];
   let contentHtml = "";
 
+  //Manejo de filtros en las diferentes vistas
   if (currentView === "characters") {
     statusFilterSelect.style.display = "inline-block";
   } else if (currentView === "episodes") {
     statusFilterSelect.style.display = "none";
+    nameSearchInput.style.display = "inline-block";
   }
   if (
     currentView === "favoriteCharacters" ||
     currentView === "favoriteEpisodes"
   ) {
+    statusFilterSelect.style.display = "none";
+    nameSearchInput.style.display = "none";
     btnRegresarFav.style.display = "inline-block";
   } else {
     btnRegresarFav.style.display = "none";
   }
 
+  //VIsta de personajes
   if (currentView === "characters") {
     let fetchUrl = currentCharacterUrl;
     if (resetPage) {
@@ -119,6 +131,8 @@ async function renderContent(resetPage = false) {
       charCurrentPageNumber,
       charTotalPages
     );
+
+    //Vista de episodios
   } else if (currentView === "episodes") {
     let fetchUrl = currentEpisodeUrl;
     if (resetPage) {
@@ -164,23 +178,57 @@ async function renderContent(resetPage = false) {
       episodeCurrentPageNumber,
       episodeTotalPages
     );
+
+    //Vista de favoritos de personajes
   } else if (currentView === "favoriteCharacters") {
+    const api = new ApiService();
     const favoriteCharacterIds = Array.from(favoriteCharacters);
-    const favoriteData = currentRawCharactersData.filter((char) =>
-      favoriteCharacterIds.includes(char.id)
-    );
-    contentHtml = favoriteData.map((char) => char.render()).join("");
+
+    try {
+      const fetchFavoritesCharacters = await api.getByIds(
+        "character",
+        favoriteCharacterIds
+      );
+      dataToRender = fetchFavoritesCharacters;
+      contentHtml = dataToRender.map((char) => char.render()).join("");
+      if (dataToRender.length === 0) {
+        contentHtml = "<p>No tienes favoritos</p>";
+      }
+    } catch (error) {
+      console.log("Error en obtener los favoritos");
+    }
+
+    //const favoriteData = currentRawCharactersData.filter((char) =>
+    //favoriteCharacterIds.includes(char.id)
+    //);
+    //contentHtml = favoriteData.map((char) => char.render()).join("");
     mainContentContainer.innerHTML = contentHtml;
-    dataToRender = favoriteData;
+    //dataToRender = favoriteData;
     updatePaginationButtons(null, null, 1, 1);
+
+    //Vista de favoritos de episodios
   } else if (currentView === "favoriteEpisodes") {
+    const api = new ApiService();
     const favoriteEpisodesIds = Array.from(favoriteEpisodes);
-    const favoriteData = currentRawEpisodesData.filter((ep) =>
-      favoriteEpisodesIds.includes(ep.id)
-    );
-    contentHtml = favoriteData.map((ep) => ep.render()).join("");
+    try {
+      const fetchFavoritesEpisodes = await api.getByIds(
+        "episode",
+        favoriteEpisodesIds
+      );
+      dataToRender = fetchFavoritesEpisodes;
+      contentHtml = dataToRender.map((ep) => ep.render()).join("");
+      if (dataToRender.length === 0) {
+        contentHtml = "<p>No tienes favoritos</p>";
+      }
+    } catch (error) {
+      console.log("Error en obtener los favoritos");
+    }
+    //const favoriteData = currentRawEpisodesData.filter((ep) =>
+    //  favoriteEpisodesIds.includes(ep.id)
+    //);
+    //contentHtml = favoriteData.map((ep) => ep.render()).join("");
     mainContentContainer.innerHTML = contentHtml;
-    dataToRender = favoriteData;
+    //dataToRender = favoriteData;
     updatePaginationButtons(null, null, 1, 1);
   }
 
@@ -198,6 +246,13 @@ async function renderContent(resetPage = false) {
   });
 }
 
+/**
+ *  Actualiza los botones de paginacion y da el numero total de paginas
+ * @param {*} prevUrl Url previa
+ * @param {*} nextUrl Url siguiente
+ * @param {*} currentPage Pagina inicial
+ * @param {*} totalPages Total de paginas
+ */
 function updatePaginationButtons(prevUrl, nextUrl, currentPage, totalPages) {
   if (prevUrl) {
     prevBtn.classList.remove("disabled");
@@ -219,7 +274,7 @@ function updatePaginationButtons(prevUrl, nextUrl, currentPage, totalPages) {
 }
 
 /**
- *
+ * Crea y muestra el modal
  * @param {string} title
  * @param {Promise<string>} contentPromise  promesa que resuelve con el HTML del contenido.
  */
@@ -268,6 +323,7 @@ async function createAndShowModal(title, contentPromise) {
   }
 }
 
+//Carga el DOM
 document.addEventListener("DOMContentLoaded", () => {
   currentView = "characters";
   loadFavorites();
@@ -291,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-//Eventos
+//VIsta de episodios
 episodesSelect.addEventListener("click", () => {
   if (currentView !== "episodes") {
     currentView = "episodes";
@@ -302,6 +358,7 @@ episodesSelect.addEventListener("click", () => {
   }
 });
 
+//Vista de personajes
 charactersButton.addEventListener("click", () => {
   if (currentView !== "characters") {
     currentView = "characters";
@@ -311,7 +368,7 @@ charactersButton.addEventListener("click", () => {
     renderContent(true);
   }
 });
-
+//Botones de prev y next
 prevBtn.addEventListener("click", (e) => {
   e.preventDefault();
   if (currentView === "characters" && charPrevPageUrl) {
@@ -334,6 +391,7 @@ nextBtn.addEventListener("click", (e) => {
   }
 });
 
+//Botones de filtro
 statusFilterSelect.addEventListener("change", () => {
   if (currentView === "characters") {
     currentCharacterFilters.status = statusFilterSelect.value;
@@ -393,10 +451,6 @@ mainContentContainer.addEventListener("click", async (e) => {
       itemFavorites(itemId, itemType);
 
       favoriteButton.classList.toggle("active");
-      console.log(
-        "Botón de favorito clicado. Estado:",
-        favoriteButton.classList.contains("active") ? "activo" : "inactivo"
-      );
     }
     return;
   }

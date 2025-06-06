@@ -1,4 +1,4 @@
-import { Episode, ApiService } from "./Classes.js";
+import { ApiService } from "./Classes.js";
 
 const apiService = new ApiService();
 

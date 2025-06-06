@@ -3,6 +3,7 @@ const favoriteEpisodesKey = "favoriteEpisodes";
 
 export let favoriteCharacters = new Set();
 export let favoriteEpisodes = new Set();
+
 /**
  * Carga los favoritos al localstorage
  */
@@ -16,11 +17,6 @@ export function loadFavorites() {
   if (storedEpisodes) {
     favoriteEpisodes = new Set(JSON.parse(storedEpisodes));
   }
-
-  console.log("Favoritos cargados: ", {
-    characters: favoriteCharacters,
-    episodes: favoriteEpisodes,
-  });
 }
 /**
  * Guarda los favoritos cargados al localstorage

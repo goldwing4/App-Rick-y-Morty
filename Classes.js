@@ -247,6 +247,72 @@ export class ApiService {
     }
   }
 
+  async getByIds(type, idsArray) {
+    if (!idsArray || idsArray.length === 0) {
+      return [];
+    }
+
+    const idsUrl = idsArray.join(",");
+    let apiUrl;
+    let ClassConstructor;
+
+    if (type === "character") {
+      apiUrl = `${this.URLCharacters}/${idsUrl}`;
+      ClassConstructor = Character;
+    } else if (type === "episode") {
+      apiUrl = `${this.URLEpisodes}/${idsUrl}`;
+      ClassConstructor = Episode;
+    } else {
+      console.log("Tipo de dato desconocido para getByIds: ", type);
+      return [];
+    }
+
+    try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        if (response.status === 404 && idsArray.length === 1) {
+          console.warn(`Item con ID ${idsArray[0]} no encontrado.`);
+          return [];
+        }
+        throw new Error(
+          `Error HTTP: ${response.status} al obtener ${type}s por IDs.`
+        );
+      }
+
+      const data = await response.json();
+
+      const itemsData = Array.isArray(data) ? data : [data];
+
+      const instances = itemsData.map((itemData) => {
+        if (type === "character") {
+          return new ClassConstructor(
+            itemData.id,
+            itemData.name,
+            itemData.status,
+            itemData.species,
+            itemData.gender,
+            itemData.image,
+            itemData.origin,
+            itemData.location,
+            itemData.episode
+          );
+        } else {
+          return new ClassConstructor(
+            itemData.id,
+            itemData.name,
+            itemData.air_date,
+            itemData.episode,
+            itemData.characters
+          );
+        }
+      });
+      return instances;
+    } catch (error) {
+      console.error(`Error al obtener ${type}s por IDs:`, error);
+      return [];
+    }
+  }
+
   /**
    *
    * @param {url} url La url de los personajes

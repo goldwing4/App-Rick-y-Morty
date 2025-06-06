@@ -478,7 +478,7 @@ footer {
 }
 .modal-characters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
   margin-top: 15px;
   border-top: 1px solid #eee;
@@ -545,7 +545,7 @@ footer {
     padding: 15px;
   }
   .modal-characters-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
   }
   .modal-character-image {
