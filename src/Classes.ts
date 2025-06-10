@@ -1,5 +1,5 @@
 import { isFavorite } from "./localStorage";
-import { type ApiCharacter, ApiEpisode, Location, ApiResponse, Filters } from "./types";
+import { type ApiCharacter,ApiEpisode,Location,ApiResponse,Filters } from "./types";
 
 /**
  * @class Clase para personaje
@@ -29,15 +29,15 @@ export class Character implements ApiCharacter {
 
 
   constructor(
-        id:       number,
-        name:     string,
-        status:   string,
-        species:  string,
-        gender:   string,
-        image:    string,
-        origin:   Location,
-        location: Location,
-        episode:  string[],
+    id: number,
+    name: string,
+    status: string,
+    species: string,
+    gender: string,
+    image: string,
+    origin: Location,
+    location: Location,
+    episode: string[],
 
   ) {
     this.id = id;
@@ -87,7 +87,7 @@ export class Character implements ApiCharacter {
   }
 
   render() {
-    const isCharFavorite = isFavorite(this.id, "character");
+    const isCharFavorite = isFavorite(this.id,"character");
     return `
       <div class="img-container" data-character-id="${this.id}">
              <img
@@ -143,9 +143,8 @@ export class Character implements ApiCharacter {
 
     return `
       <div class="modal-content-character">
-        <img src="${this.image}" alt="${
-      this.name
-    }" class="modal-character-image-large">
+        <img src="${this.image}" alt="${this.name
+      }" class="modal-character-image-large">
         <h3>${this.name}</h3>
         <p><strong>Estado:</strong> ${this.status}</p>
         <p><strong>Especie:</strong> ${this.species}</p>
@@ -176,7 +175,7 @@ export class Episode implements ApiEpisode {
   characters: string[];
 
 
-  constructor(id: number, name: string, air_date: string, episode: string, characters: string[]) {
+  constructor(id: number,name: string,air_date: string,episode: string,characters: string[]) {
     this.id = id;
     this.name = name;
     this.air_date = air_date;
@@ -185,7 +184,7 @@ export class Episode implements ApiEpisode {
   }
 
   render() {
-    const isEpFavorite = isFavorite(this.id, "episode");
+    const isEpFavorite = isFavorite(this.id,"episode");
     return `<div class="episode-card" data-episode-id ="${this.id}">
         <h3 class="episode-name">${this.id}. ${this.name}</h3>
         <p class="episode-date">${this.air_date}</p>
@@ -253,38 +252,37 @@ export class Episode implements ApiEpisode {
  */
 
 export class ApiService {
-  constructor() {}
+  constructor() { }
   URLCharacters = "https://rickandmortyapi.com/api/character";
   URLEpisodes = "https://rickandmortyapi.com/api/episode";
 
-  async getData(type: string, url: null | string, params: Filters) {
+  async getData(type: string,url: null | string,params: Filters) {
     switch (type) {
       case "personajes":
-        return this.#getAllCharacters(url || this.URLCharacters, params);
+        return this.#getAllCharacters(url || this.URLCharacters,params);
       case "episodios":
-        return this.#getAllEpisodes(url || this.URLEpisodes, params);
+        return this.#getAllEpisodes(url || this.URLEpisodes,params);
       default:
         throw new Error("Tipo de datos no soportado.");
     }
   }
 
-  async getByIds(type: string, idsArray: number[]) {
+  async getByIds(type: string,idsArray: number[]) {
     if (!idsArray || idsArray.length === 0) {
       return [];
     }
 
     const idsUrl = idsArray.join(",");
-    let apiUrl;
-    let ClassConstructor;
+    let apiUrl: string;
+
 
     if (type === "character") {
       apiUrl = `${this.URLCharacters}/${idsUrl}`;
-      ClassConstructor = Character;
+
     } else if (type === "episode") {
       apiUrl = `${this.URLEpisodes}/${idsUrl}`;
-      ClassConstructor = Episode;
     } else {
-      console.log("Tipo de dato desconocido para getByIds: ", type);
+      console.log("Tipo de dato desconocido para getByIds: ",type);
       return [];
     }
 
@@ -300,36 +298,37 @@ export class ApiService {
         );
       }
 
-      const data: (ApiCharacter | ApiEpisode ) = await response.json();
+      const rawData: ApiCharacter | ApiEpisode | ApiCharacter[] | ApiEpisode[] = await response.json();
+      const itemsData: (ApiCharacter | ApiEpisode)[] = Array.isArray(rawData) ? rawData : [rawData];
 
-      const itemsData = Array.isArray(data) ? data : [data];
-
-      const instances = itemsData.map((itemData) => {
+      const instances = itemsData.map((itemData: ApiCharacter | ApiEpisode) => {
         if (type === "character") {
-          return new ClassConstructor(
-            itemData.id,
-            itemData.name,
-            itemData.status,
-            itemData.species,
-            itemData.gender,
-            itemData.image,
-            itemData.origin,
-            itemData.location,
-            itemData.episode,
+          const charData = itemData as ApiCharacter;
+          return new Character(
+            charData.id,
+            charData.name,
+            charData.status,
+            charData.species,
+            charData.gender,
+            charData.image,
+            charData.origin,
+            charData.location,
+            charData.episode
           );
         } else {
+          const epData = itemData as ApiEpisode;
           return new Episode(
-            itemData.id,
-            itemData.name,
-            itemData.air_date,
-            itemData.episode,
-            itemData.characters
+            epData.id,
+            epData.name,
+            epData.air_date,
+            epData.episode,
+            epData.characters
           );
         }
       });
       return instances;
     } catch (error) {
-      console.error(`Error al obtener ${type}s por IDs:`, error);
+      console.error(`Error al obtener ${type}s por IDs:`,error);
       return [];
     }
   }
@@ -341,12 +340,12 @@ export class ApiService {
    * @returns Una promesa con los datos del personaje
    */
 
-  async #getAllCharacters(url: string, params: Filters) {
+  async #getAllCharacters(url: string,params: Filters) {
     try {
       const urlObj = new URL(url);
       for (const key in params) {
         if (params[key]) {
-          urlObj.searchParams.set(key, params[key]);
+          urlObj.searchParams.set(key,params[key]);
         }
       }
       const response = await fetch(urlObj.toString());
@@ -356,7 +355,7 @@ export class ApiService {
       const charactersData: ApiResponse = await response.json();
 
       const characters: Character[] = charactersData.results.map(
-        (charData) =>
+        (charData: Character) =>
           new Character(
             charData.id,
             charData.name,
@@ -369,9 +368,9 @@ export class ApiService {
             charData.episode,
           )
       );
-      return { info: charactersData.info, results: characters };
+      return { info: charactersData.info,results: characters };
     } catch (error) {
-      console.error("Error al obtener los personajes: ", error);
+      console.error("Error al obtener los personajes: ",error);
       return {
         info: {
           count: 0,
@@ -390,12 +389,12 @@ export class ApiService {
    * @returns Una promesa con los datos del episodio
    */
 
-  async #getAllEpisodes(url: string, params: Filters) {
+  async #getAllEpisodes(url: string,params: Filters) {
     try {
       const urlObj = new URL(url);
       for (const key in params) {
         if (params[key]) {
-          urlObj.searchParams.set(key, params[key]);
+          urlObj.searchParams.set(key,params[key]);
         }
       }
       const response = await fetch(urlObj.toString());
@@ -404,7 +403,7 @@ export class ApiService {
       }
       const episodesData: ApiResponse = await response.json();
       const episodes = episodesData.results.map(
-        (episodeData) =>
+        (episodeData: Episode) =>
           new Episode(
             episodeData.id,
             episodeData.name,
@@ -413,9 +412,9 @@ export class ApiService {
             episodeData.characters,
           )
       );
-      return { info: episodesData.info, results: episodes };
+      return { info: episodesData.info,results: episodes };
     } catch (error) {
-      console.error("Error al obtener episodios: ", error);
+      console.error("Error al obtener episodios: ",error);
       return {
         info: {
           count: 0,

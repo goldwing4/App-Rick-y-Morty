@@ -21,7 +21,7 @@ export async function getCharactersHtml(url: string, filters: Filters): Promise<
   return {
     html: charactersHtml,
     info: data.info,
-    rawCharactersData: data.results || null,
+    rawCharactersData: (data.results as Character[]) || [],
   };
 }
 

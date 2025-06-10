@@ -8,7 +8,7 @@ import {
   getPageNumberFromUrlEpisodes as getEpisodePageNumber,
 } from "./Episode";
 
-import { ApiService, Episode, Character } from "./Classes";
+import { ApiService,Episode,Character } from "./Classes";
 import {
   loadFavorites,
   itemFavorites,
@@ -17,17 +17,17 @@ import {
   favoriteEpisodes,
 } from "./localStorage";
 
-import { Filters, DataCardElement } from "./types";
+import { Filters,DataCardElement } from "./types";
 
 //Variables para el DOM
 const episodesSelect = document.getElementById("episodes") as HTMLAnchorElement;
 const charactersButton = document.getElementById("character") as HTMLAnchorElement;
-const mainContentContainer= document.querySelector("article") as HTMLDivElement;
+const mainContentContainer = document.querySelector("article") as HTMLDivElement;
 const prevBtn = document.getElementById("PrevBtn") as HTMLButtonElement;
 const nextBtn = document.getElementById("NextBtn") as HTMLButtonElement;
 const pageInfoLi = document.getElementById("Number") as HTMLParagraphElement;
 const nameSearchInput = document.getElementById("searchName") as HTMLInputElement;
-const statusFilterSelect = document.getElementById("statusFilter") as HTMLSelectElement; 
+const statusFilterSelect = document.getElementById("statusFilter") as HTMLSelectElement;
 const btnRegresarFav = document.getElementById("btnRegresar") as HTMLButtonElement;
 
 //Datos crudos
@@ -62,12 +62,12 @@ let currentEpisodeFilters: Filters = {
 
 /**
  * @function renderContent Renderiza el contenido de personajes/caracteres/favoritos
- * @param {*} resetPage
+ * 
  */
 async function renderContent(resetPage = false) {
-  
+
   mainContentContainer.innerHTML = `<p> Cargando ${currentView}...</p>`;
-  
+
   let dataToRender: (Character | Episode)[] = [];
   let contentHtml = "";
 
@@ -97,13 +97,13 @@ async function renderContent(resetPage = false) {
       const baseUrl = new URL(new ApiService().URLCharacters);
       for (const key in currentCharacterFilters) {
         if (currentCharacterFilters[key]) {
-          baseUrl.searchParams.set(key, currentCharacterFilters[key]);
+          baseUrl.searchParams.set(key,currentCharacterFilters[key]);
         }
       }
       fetchUrl = baseUrl.toString();
     }
 
-    const { html, info, rawCharactersData } = await getCharactersHtml(
+    const { html,info,rawCharactersData } = await getCharactersHtml(
       fetchUrl,
       currentCharacterFilters
     );
@@ -119,9 +119,9 @@ async function renderContent(resetPage = false) {
     } else if (charNextPageUrl === null) {
       charCurrentPageNumber = charTotalPages;
     } else {
-      
+
       charCurrentPageNumber = getCharPageNumber(charPrevPageUrl) + 1;
-     
+
     }
     if (charTotalPages === 0) charCurrentPageNumber = 0;
     else if (
@@ -145,13 +145,13 @@ async function renderContent(resetPage = false) {
       const baseUrl = new URL(new ApiService().URLEpisodes);
       for (const key in currentEpisodeFilters) {
         if (currentEpisodeFilters[key]) {
-          baseUrl.searchParams.set(key, currentEpisodeFilters[key]);
+          baseUrl.searchParams.set(key,currentEpisodeFilters[key]);
         }
       }
       fetchUrl = baseUrl.toString();
     }
 
-    const { html, info, rawEpisodesData } = await getEpisodesHtml(
+    const { html,info,rawEpisodesData } = await getEpisodesHtml(
       fetchUrl,
       currentEpisodeFilters
     );
@@ -168,7 +168,7 @@ async function renderContent(resetPage = false) {
     } else if (episodeNextPageUrl === null) {
       episodeCurrentPageNumber = episodeTotalPages;
     } else {
-      episodeCurrentPageNumber = getEpisodePageNumber(episodePrevPageUrl) + 1 ;
+      episodeCurrentPageNumber = getEpisodePageNumber(episodePrevPageUrl) + 1;
     }
     if (episodeTotalPages === 0) episodeCurrentPageNumber = 0;
     else if (
@@ -210,7 +210,7 @@ async function renderContent(resetPage = false) {
     //contentHtml = favoriteData.map((char) => char.render()).join("");
     mainContentContainer.innerHTML = contentHtml;
     //dataToRender = favoriteData;
-    updatePaginationButtons(null, null, 1, 1);
+    updatePaginationButtons(null,null,1,1);
 
     //Vista de favoritos de episodios
   } else if (currentView === "favoriteEpisodes") {
@@ -235,7 +235,7 @@ async function renderContent(resetPage = false) {
     //contentHtml = favoriteData.map((ep) => ep.render()).join("");
     mainContentContainer.innerHTML = contentHtml;
     //dataToRender = favoriteData;
-    updatePaginationButtons(null, null, 1, 1);
+    updatePaginationButtons(null,null,1,1);
   }
 
   dataToRender.forEach((item) => {
@@ -245,7 +245,7 @@ async function renderContent(resetPage = false) {
     );
     if (cardElement) {
       const favoriteButton = cardElement.querySelector(".favorite");
-      if (favoriteButton && isFavorite(item.id, type)) {
+      if (favoriteButton && isFavorite(item.id,type)) {
         favoriteButton.classList.add("active");
       }
     }
@@ -259,13 +259,13 @@ async function renderContent(resetPage = false) {
  * @param {*} currentPage Pagina inicial
  * @param {*} totalPages Total de paginas
  */
-function updatePaginationButtons(prevUrl: string | null , nextUrl: string | null, currentPage: number | null, totalPages:number) {
+function updatePaginationButtons(prevUrl: string | null,nextUrl: string | null,currentPage: number | null,totalPages: number) {
   if (prevUrl) {
     prevBtn.classList.remove("disabled");
     prevBtn.removeAttribute("tabindex");
   } else {
     prevBtn.classList.add("disabled");
-    prevBtn.setAttribute("tabindex", "-1");
+    prevBtn.setAttribute("tabindex","-1");
   }
 
   pageInfoLi.textContent = `Página ${currentPage} de ${totalPages}`;
@@ -275,7 +275,7 @@ function updatePaginationButtons(prevUrl: string | null , nextUrl: string | null
     nextBtn.removeAttribute("tabindex");
   } else {
     nextBtn.classList.add("disabled");
-    nextBtn.setAttribute("tabindex", "-1");
+    nextBtn.setAttribute("tabindex","-1");
   }
 }
 
@@ -284,7 +284,7 @@ function updatePaginationButtons(prevUrl: string | null , nextUrl: string | null
  * @param {string} title
  * @param {Promise<string>} contentPromise  promesa que resuelve con el HTML del contenido.
  */
-async function createAndShowModal(title: string, contentPromise: Promise<string>) {
+async function createAndShowModal(title: string,contentPromise: Promise<string>) {
   if (!globalModalInstance) {
     globalModalInstance = document.createElement("dialog");
     globalModalInstance.id = "dynamicModal";
@@ -301,29 +301,29 @@ async function createAndShowModal(title: string, contentPromise: Promise<string>
             </div>
         `;
 
-        const closeBtn = globalModalInstance.querySelector("#closeModalBtn") 
+    const closeBtn = globalModalInstance.querySelector("#closeModalBtn")
 
-      if (closeBtn instanceof HTMLButtonElement){
-          closeBtn.addEventListener("click", () => {
+    if (closeBtn instanceof HTMLButtonElement) {
+      closeBtn.addEventListener("click",() => {
         globalModalInstance?.close();
       });
-      }
+    }
 
 
-    globalModalInstance.addEventListener("click", (e: MouseEvent) => {
+    globalModalInstance.addEventListener("click",(e: MouseEvent) => {
       if (e.target === globalModalInstance) {
         globalModalInstance?.close();
       }
     });
   }
-    
+
   if (!globalModalInstance) {
-      console.error("El modal no pudo ser inicializado.");
-      return; // Salir si el modal no se pudo crear
+    console.error("El modal no pudo ser inicializado.");
+    return; // Salir si el modal no se pudo crear
   }
 
   const modalTitleElement = globalModalInstance.querySelector("#modalTitle")
-  if (modalTitleElement instanceof HTMLElement){
+  if (modalTitleElement instanceof HTMLElement) {
     modalTitleElement.textContent = title
   }
 
@@ -336,19 +336,19 @@ async function createAndShowModal(title: string, contentPromise: Promise<string>
     const contentHtml = await contentPromise;
     modalContentDiv.innerHTML = contentHtml;
   } catch (error) {
-    console.error("Error al cargar contenido del modal:", error);
+    console.error("Error al cargar contenido del modal:",error);
     modalContentDiv.innerHTML = "<p>Error al cargar la información.</p>";
   }
 }
 
 //Carga el DOM
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",() => {
   currentView = "characters";
   loadFavorites();
   renderContent();
   const viewFavoritesBtn = document.getElementById("viewFavoritesBtn");
   if (viewFavoritesBtn) {
-    viewFavoritesBtn.addEventListener("click", () => {
+    viewFavoritesBtn.addEventListener("click",() => {
       if (
         currentView === "characters" ||
         currentView === "favoriteCharacters"
@@ -366,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //VIsta de episodios
-episodesSelect.addEventListener("click", () => {
+episodesSelect.addEventListener("click",() => {
   if (currentView !== "episodes") {
     currentView = "episodes";
     currentEpisodeUrl = new ApiService().URLEpisodes;
@@ -377,7 +377,7 @@ episodesSelect.addEventListener("click", () => {
 });
 
 //Vista de personajes
-charactersButton.addEventListener("click", () => {
+charactersButton.addEventListener("click",() => {
   if (currentView !== "characters") {
     currentView = "characters";
     currentCharacterUrl = new ApiService().URLCharacters;
@@ -387,7 +387,7 @@ charactersButton.addEventListener("click", () => {
   }
 });
 //Botones de prev y next
-prevBtn.addEventListener("click", (e) => {
+prevBtn.addEventListener("click",(e) => {
   e.preventDefault();
   if (currentView === "characters" && charPrevPageUrl) {
     currentCharacterUrl = charPrevPageUrl;
@@ -398,7 +398,7 @@ prevBtn.addEventListener("click", (e) => {
   }
 });
 
-nextBtn.addEventListener("click", (e) => {
+nextBtn.addEventListener("click",(e) => {
   e.preventDefault();
   if (currentView === "characters" && charNextPageUrl) {
     currentCharacterUrl = charNextPageUrl;
@@ -410,7 +410,7 @@ nextBtn.addEventListener("click", (e) => {
 });
 
 //Botones de filtro
-statusFilterSelect.addEventListener("change", () => {
+statusFilterSelect.addEventListener("change",() => {
   if (currentView === "characters") {
     currentCharacterFilters.status = statusFilterSelect.value;
     currentCharacterFilters.name = nameSearchInput.value.trim();
@@ -419,7 +419,7 @@ statusFilterSelect.addEventListener("change", () => {
   }
 });
 
-btnRegresarFav.addEventListener("click", () => {
+btnRegresarFav.addEventListener("click",() => {
   if (currentView === "favoriteCharacters") {
     currentView = "characters";
     renderContent(true);
@@ -431,7 +431,7 @@ btnRegresarFav.addEventListener("click", () => {
   }
 });
 
-nameSearchInput.addEventListener("input", (e) => {
+nameSearchInput.addEventListener("input",(e) => {
   if (currentView === "characters") {
     currentCharacterFilters.name = nameSearchInput.value.trim();
     currentCharacterUrl = new ApiService().URLCharacters;
@@ -443,10 +443,10 @@ nameSearchInput.addEventListener("input", (e) => {
   }
 });
 
-nameSearchInput.addEventListener("keypress", (e) => {
+nameSearchInput.addEventListener("keypress",(e) => {
   if (!(e.target instanceof HTMLElement)) {
     console.error("El target del evento no es un HTMLElement.");
-    return; 
+    return;
   }
   if (e.key === "Enter") {
     e.target.blur();
@@ -454,17 +454,17 @@ nameSearchInput.addEventListener("keypress", (e) => {
 });
 
 //Evento para mostrar el modal
-mainContentContainer.addEventListener("click", async (e) => {
-   if (!(e.target instanceof HTMLElement)) {
+mainContentContainer.addEventListener("click",async (e) => {
+  if (!(e.target instanceof HTMLElement)) {
     console.error("El target del evento no es un HTMLElement.");
-    return; 
+    return;
   }
 
   const favoriteButton = e.target.closest(".favorite");
   if (favoriteButton) {
     e.stopPropagation();
 
-    const cardElement: DataCardElement | null = 
+    const cardElement: DataCardElement | null =
       favoriteButton.closest(".img-container") ||
       favoriteButton.closest(".episode-card");
     if (cardElement) {
@@ -481,57 +481,51 @@ mainContentContainer.addEventListener("click", async (e) => {
         return;
       }
 
- 
+
       const itemType: "character" | "episode" = cardElement.classList.contains("img-container")
         ? "character"
         : "episode";
 
-      itemFavorites(itemId, itemType);
+      itemFavorites(itemId,itemType);
 
 
       favoriteButton.classList.toggle("active");
     }
-    return; 
+    return;
   }
-  
+
 
 
 
   const characterCard = e.target.closest(".img-container");
   const episodeCard = e.target.closest(".episode-card");
 
- 
+
 
   if (characterCard instanceof HTMLElement) {
-    console.log("Se hizo clic dentro de un contenedor de imagen de personaje.");
-    console.log("ID del contenedor:", characterCard.id);
-   
-  } else {
-    console.log("El clic no ocurrió dentro de un '.img-container'.");
+    console.log("Se hizo clic dentro de un contenedor  de personaje.");
+
   }
   if (episodeCard instanceof HTMLElement) {
-  
+
     console.log("Se hizo clic dentro de una tarjeta de episodio.");
-    console.log("Contenido del episodio:", episodeCard.id);
-   
-  } else {
-    console.log("El clic no ocurrió dentro de un '.episode-card'.");
+
   }
 
 
-   if (
-    (characterCard instanceof HTMLElement && characterCard.dataset.characterId !== undefined) && 
+  if (
+    (characterCard instanceof HTMLElement && characterCard.dataset.characterId !== undefined) &&
     (currentView === "characters" || currentView === "favoriteCharacters")
   ) {
     const characterIdString = characterCard.dataset.characterId;
     const characterId: number = parseInt(characterIdString);
 
     if (isNaN(characterId)) {
-        console.error(`ID de personaje inválido: '${characterIdString}'.`);
-        return;
+      console.error(`ID de personaje inválido: '${characterIdString}'.`);
+      return;
     }
 
-   
+
     const character = currentRawCharactersData.find(
       (char) => char.id === characterId
     );
@@ -545,18 +539,18 @@ mainContentContainer.addEventListener("click", async (e) => {
   }
 
   else if (
-    (episodeCard instanceof HTMLElement && episodeCard.dataset.episodeId !== undefined) && 
+    (episodeCard instanceof HTMLElement && episodeCard.dataset.episodeId !== undefined) &&
     (currentView === "episodes" || currentView === "favoriteEpisodes")
   ) {
     const episodeIdString = episodeCard.dataset.episodeId;
     const episodeId: number = parseInt(episodeIdString);
 
     if (isNaN(episodeId)) {
-        console.error(`ID de episodio inválido: '${episodeIdString}'.`);
-        return;
+      console.error(`ID de episodio inválido: '${episodeIdString}'.`);
+      return;
     }
 
-   
+
     const episode = currentRawEpisodesData.find((ep) => ep.id === episodeId);
 
     if (episode) {
@@ -574,11 +568,11 @@ const navBar = document.querySelector("nav") as HTMLElement,
   overlay = document.querySelector(".overlay") as HTMLElement;
 
 menuBtns.forEach((menuBtn) => {
-  menuBtn.addEventListener("click", () => {
+  menuBtn.addEventListener("click",() => {
     navBar.classList.toggle("open");
   });
 });
 
-overlay.addEventListener("click", () => {
+overlay.addEventListener("click",() => {
   navBar.classList.remove("open");
 });

@@ -1,4 +1,4 @@
-import { ApiService, Episode } from "./Classes";
+import { ApiService, Character, Episode } from "./Classes";
 import { Filters, Info, ApiResponse, ApiEpisode } from "./types";
 
 const apiService = new ApiService();
@@ -18,7 +18,7 @@ export async function getEpisodesHtml(url: string, filters: Filters): Promise<{ 
   return {
     html: episodesHtml,
     info: data.info,
-    rawEpisodesData: data.results || null,
+    rawEpisodesData: (data.results as Episode[]) || [],
   };
 }
 
