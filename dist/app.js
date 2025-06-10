@@ -48,6 +48,7 @@ async function renderContent(resetPage = false) {
     //Manejo de filtros en las diferentes vistas
     if (currentView === "characters") {
         statusFilterSelect.style.display = "inline-block";
+        nameSearchInput.style.display = "inline-block";
     }
     else if (currentView === "episodes") {
         statusFilterSelect.style.display = "none";
@@ -112,7 +113,7 @@ async function renderContent(resetPage = false) {
         }
         const { html, info, rawEpisodesData } = await getEpisodesHtml(fetchUrl, currentEpisodeFilters);
         mainContentContainer.innerHTML = html;
-        //currentRawEpisodesData = rawEpisodesData;
+        currentRawEpisodesData = rawEpisodesData;
         dataToRender = rawEpisodesData;
         episodePrevPageUrl = info.prev;
         episodeNextPageUrl = info.next;
